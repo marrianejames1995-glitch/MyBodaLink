@@ -12,11 +12,14 @@ import {
   LogOut,
   ChevronRight,
   AlertTriangle,
+  Download,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useToast } from '@/contexts/ToastContext'
 import { PageHeader } from '@/components/PageHeader'
+import { InstallAppButton } from '@/components/InstallAppButton'
+import { usePwaInstall } from '@/lib/usePwaInstall'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { deleteAccount } from '@/lib/api'
@@ -101,6 +104,11 @@ export default function SettingsPage() {
           label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
           onClick={toggleTheme}
         />
+      </Section>
+
+      {/* App — install */}
+      <Section title="App">
+        <InstallEntry />
       </Section>
 
       {/* About & support */}
@@ -193,6 +201,43 @@ export default function SettingsPage() {
           </label>
         </div>
       </Modal>
+    </div>
+  )
+}
+
+/**
+ * Settings list entry for installing the PWA. Uses the same visual style as
+ * Item, but renders the install button (or an "installed" state) instead of a
+ * navigation row. The button handles Android/desktop native prompts + the iOS
+ * Share → Add to Home Screen guide automatically.
+ */
+function InstallEntry() {
+  const { isInstalled } = usePwaInstall()
+
+  if (isInstalled) {
+    return (
+      <div className="flex items-center gap-3 px-4 py-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+          <Download size={18} />
+        </span>
+        <span className="flex-1 font-medium text-gray-900 dark:text-gray-100">
+          App installed ✓
+        </span>
+        <span className="text-xs text-gray-400">On home screen</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-3">
+      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+        <Download size={18} />
+      </span>
+      <div className="flex-1">
+        <p className="font-medium text-gray-900 dark:text-gray-100">Install MyBodaLink</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Add to your home screen</p>
+      </div>
+      <InstallAppButton />
     </div>
   )
 }
